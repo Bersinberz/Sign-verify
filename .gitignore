@@ -1,0 +1,67 @@
+# -------------------------
+# Python Bytecode / Environment
+# -------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.env
+*.venv
+env/
+venv/
+ENV/
+
+# -------------------------
+# PyTorch / Model Checkpoints
+# -------------------------
+*.pth
+*.pt
+**/siamese_epoch*.pth
+*.ckpt
+
+# -------------------------
+# Dataset / Temporary Files
+# -------------------------
+*.csv
+*.h5
+*.npy
+*.npz
+*.db
+*.sqlite
+data/
+datasets/
+output/
+logs/
+
+# -------------------------
+# Flask / Web App
+# -------------------------
+instance/
+*.sqlite3
+*.log
+*.pid
+*.swp
+
+# -------------------------
+# IDE / OS files
+# -------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# -------------------------
+# Jupyter Notebook
+# -------------------------
+.ipynb_checkpoints/
+
+# -------------------------
+# Node / PWA files
+# -------------------------
+node_modules/
+dist/
+build/
+*.map
+service-worker.js

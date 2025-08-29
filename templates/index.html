@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signature Verification</title>
+    <style>
+        /* General Body and Container Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            flex-direction: column;
+        }
+
+        h1 {
+            color: #1e3a5f;
+            margin-bottom: 30px;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        /* Form and Input Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            text-align: left;
+        }
+
+        .file-upload-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .custom-file-input {
+            width: 100%;
+            height: 45px;
+            padding: 0 15px;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .custom-file-input:hover {
+            background-color: #e2e6ea;
+        }
+        
+        /* Hiding the default file input */
+        .file-input {
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .custom-file-text {
+            color: #6c757d;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            padding-right: 10px;
+        }
+
+        .upload-icon {
+            font-size: 1.5em;
+            color: #6c757d;
+        }
+
+        /* Submit Button Styles */
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Result Section Styles */
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            background-color: #f8f9fa;
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+        
+        .result {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .match {
+            color: #28a745;
+        }
+
+        .forgery {
+            color: #dc3545;
+        }
+        
+        .distance-info {
+            font-size: 1em;
+            color: #6c757d;
+        }
+        
+        /* Mobile-first Media Queries */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.5em;
+            }
+
+            .submit-btn {
+                padding: 10px 15px;
+                font-size: 1em;
+            }
+
+            .custom-file-input {
+                height: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Signature Verification</h1>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="file-upload-wrapper">
+            <label class="file-upload-label" for="file1">Upload Signature 1:</label>
+            <div class="custom-file-input">
+                <span class="custom-file-text" id="file1-text">No file chosen</span>
+                <span class="upload-icon">📁</span>
+            </div>
+            <input type="file" class="file-input" name="file1" id="file1" required>
+        </div>
+        
+        <div class="file-upload-wrapper">
+            <label class="file-upload-label" for="file2">Upload Signature 2:</label>
+            <div class="custom-file-input">
+                <span class="custom-file-text" id="file2-text">No file chosen</span>
+                <span class="upload-icon">📁</span>
+            </div>
+            <input type="file" class="file-input" name="file2" id="file2" required>
+        </div>
+        
+        <input type="submit" class="submit-btn" value="Verify Signatures">
+    </form>
+
+    {% if result %}
+        <div class="result-container">
+            <div class="result {% if 'MATCH' in result %}match{% else %}forgery{% endif %}">
+                <strong>Result:</strong> {{ result }}
+            </div>
+            <div class="distance-info">
+                <strong>Euclidean Distance:</strong> {{ distance }}
+            </div>
+        </div>
+    {% endif %}
+    
+    <script>
+        // JavaScript to update the file names
+        document.querySelectorAll('.file-input').forEach(input => {
+            input.addEventListener('change', (e) => {
+                const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
+                const textElementId = e.target.id + '-text';
+                document.getElementById(textElementId).textContent = fileName;
+            });
+        });
+    </script>
+</body>
+</html>
