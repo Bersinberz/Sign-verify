@@ -43,7 +43,7 @@ class SiameseNetwork(nn.Module):
 # -------------------------------
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = SiameseNetwork().to(device)
-model_path = "siamese_epoch20.pth"
+model_path = "checkpoints/siamese_best.pth"
 model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 
