@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, send_from_directory, jsonify
 from PIL import Image
 import torch
 import torch.nn as nn
@@ -8,7 +8,7 @@ import torchvision.transforms as transforms
 from werkzeug.utils import secure_filename
 
 # -------------------------------
-# Siamese Network
+# Siamese Network Definition
 # -------------------------------
 class SiameseNetwork(nn.Module):
     def __init__(self):
@@ -16,13 +16,13 @@ class SiameseNetwork(nn.Module):
         self.cnn = nn.Sequential(
             nn.Conv2d(1, 32, 5),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2,2),
+            nn.MaxPool2d(2, 2),
             nn.Conv2d(32, 64, 5),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2,2),
+            nn.MaxPool2d(2, 2),
             nn.Conv2d(64, 128, 3),
             nn.ReLU(inplace=True),
-            nn.MaxPool2d(2,2)
+            nn.MaxPool2d(2, 2)
         )
         self.fc = nn.Sequential(
             nn.Linear(51200, 512),
@@ -39,7 +39,7 @@ class SiameseNetwork(nn.Module):
         return self.forward_once(x1), self.forward_once(x2)
 
 # -------------------------------
-# Load model once
+# Model Loading
 # -------------------------------
 device = "cuda" if torch.cuda.is_available() else "cpu"
 model = SiameseNetwork().to(device)
@@ -48,11 +48,11 @@ model.load_state_dict(torch.load(model_path, map_location=device))
 model.eval()
 
 # -------------------------------
-# Image preprocessing
+# Image Preprocessing
 # -------------------------------
 def preprocess_image(img_path):
     transform = transforms.Compose([
-        transforms.Resize((155,220)),
+        transforms.Resize((155, 220)),
         transforms.ToTensor()
     ])
     img = Image.open(img_path).convert("L")
@@ -60,41 +60,73 @@ def preprocess_image(img_path):
     return img
 
 # -------------------------------
-# Flask setup
+# Flask Setup
 # -------------------------------
 app = Flask(__name__)
 UPLOAD_FOLDER = "uploads"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+
+@app.route("/uploads/<filename>")
+def uploaded_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], filename)
 
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
     distance = None
+    file1_url = None
+    file2_url = None
+
     if request.method == "POST":
-        if "file1" not in request.files or "file2" not in request.files:
-            result = "No files uploaded!"
-        else:
-            file1 = request.files["file1"]
-            file2 = request.files["file2"]
-            path1 = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file1.filename))
-            path2 = os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(file2.filename))
-            file1.save(path1)
-            file2.save(path2)
+        file1 = request.files.get("file1")
+        file2 = request.files.get("file2")
 
-            # preprocess images
-            img1 = preprocess_image(path1).to(device)
-            img2 = preprocess_image(path2).to(device)
+        if not file1 or not file2:
+            return jsonify({"error": "No files uploaded!"})
 
-            # predict
-            with torch.no_grad():
-                output1, output2 = model(img1, img2)
-                distance = F.pairwise_distance(output1, output2).item()
+        # Save uploaded files
+        file1_name = secure_filename(file1.filename)
+        file2_name = secure_filename(file2.filename)
 
-            threshold = 1.0  # adjust based on validation
-            result = "✅ MATCH (likely genuine)" if distance < threshold else "❌ DO NOT MATCH (likely forgery)"
+        path1 = os.path.join(app.config["UPLOAD_FOLDER"], file1_name)
+        path2 = os.path.join(app.config["UPLOAD_FOLDER"], file2_name)
 
-    return render_template("index.html", result=result, distance=distance)
+        file1.save(path1)
+        file2.save(path2)
+
+        # Preprocess
+        img1 = preprocess_image(path1).to(device)
+        img2 = preprocess_image(path2).to(device)
+
+        # Model prediction
+        with torch.no_grad():
+            output1, output2 = model(img1, img2)
+            distance = F.pairwise_distance(output1, output2).item()
+
+        threshold = 1.0
+        result = "MATCH (likely genuine)" if distance < threshold else "DO NOT MATCH (likely forgery)"
+
+        # URLs for frontend preview
+        file1_url = f"/uploads/{file1_name}"
+        file2_url = f"/uploads/{file2_name}"
+
+        # Always return JSON for AJAX
+        return jsonify({
+            "result": result,
+            "distance": distance,
+            "file1_url": file1_url,
+            "file2_url": file2_url
+        })
+
+    # Regular GET request
+    return render_template(
+        "index.html",
+        result=result,
+        distance=distance,
+        file1_url=file1_url,
+        file2_url=file2_url
+    )
 
 if __name__ == "__main__":
     app.run(debug=True)

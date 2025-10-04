@@ -1,213 +1,250 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Signature Verification</title>
-    <style>
-        /* General Body and Container Styles */
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f2f5;
-            color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-            flex-direction: column;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signature Verification</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f0f2f5;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 40px 20px;
+      min-height: 100vh;
+    }
 
-        h1 {
-            color: #1e3a5f;
-            margin-bottom: 30px;
-            font-size: 2em;
-            text-align: center;
-        }
+    h1 {
+      color: #1e3a5f;
+      margin-bottom: 30px;
+      font-size: 2em;
+      text-align: center;
+    }
 
-        /* Form and Input Styles */
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 450px;
-        }
+    .upload-section {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      flex-wrap: wrap;
+      width: 100%;
+      max-width: 900px;
+    }
 
-        .file-upload-wrapper {
-            position: relative;
-            text-align: left;
-        }
+    .file-upload-container {
+      flex: 1;
+      min-width: 250px;
+      max-width: 400px;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
 
-        .file-upload-label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #555;
-        }
+    .file-upload-label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: #555;
+    }
 
-        .custom-file-input {
-            width: 100%;
-            height: 45px;
-            padding: 0 15px;
-            background-color: #e9ecef;
-            border: 1px solid #ced4da;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-        }
+    .custom-file-input {
+      background-color: #e9ecef;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      height: 45px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 15px;
+      cursor: pointer;
+      position: relative;
+    }
 
-        .custom-file-input:hover {
-            background-color: #e2e6ea;
-        }
-        
-        /* Hiding the default file input */
-        .file-input {
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
+    .file-input {
+      position: absolute;
+      opacity: 0;
+      width: 100%;
+      height: 100%;
+      cursor: pointer;
+    }
 
-        .custom-file-text {
-            color: #6c757d;
-            overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
-            padding-right: 10px;
-        }
+    .custom-file-text {
+      color: #6c757d;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      padding-right: 10px;
+    }
 
-        .upload-icon {
-            font-size: 1.5em;
-            color: #6c757d;
-        }
+    .preview-container {
+      margin-top: 15px;
+      text-align: center;
+    }
 
-        /* Submit Button Styles */
-        .submit-btn {
-            background-color: #007bff;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
-            margin-top: 10px;
-        }
+    .preview-container img {
+      max-width: 100%;
+      max-height: 220px;
+      border: 1px solid #ced4da;
+      border-radius: 8px;
+      object-fit: contain;
+      background-color: #fff;
+      padding: 5px;
+    }
 
-        .submit-btn:hover {
-            background-color: #0056b3;
-            transform: translateY(-2px);
-        }
+    .submit-btn {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 20px;
+      font-size: 1.1em;
+      cursor: pointer;
+      transition: background-color 0.3s, transform 0.2s;
+      margin-top: 30px;
+    }
 
-        .submit-btn:active {
-            transform: translateY(0);
-        }
+    .submit-btn:hover {
+      background-color: #0056b3;
+      transform: translateY(-2px);
+    }
 
-        /* Result Section Styles */
-        .result-container {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #ced4da;
-            background-color: #f8f9fa;
-            width: 100%;
-            max-width: 450px;
-            text-align: center;
-        }
-        
-        .result {
-            font-size: 1.2em;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-        
-        .match {
-            color: #28a745;
-        }
+    .result-container {
+      margin-top: 40px;
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid #ced4da;
+      background-color: #f8f9fa;
+      text-align: center;
+      width: 100%;
+      max-width: 500px;
+      display: none;
+    }
 
-        .forgery {
-            color: #dc3545;
-        }
-        
-        .distance-info {
-            font-size: 1em;
-            color: #6c757d;
-        }
-        
-        /* Mobile-first Media Queries */
-        @media (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
+    .match {
+      color: #28a745;
+      font-weight: bold;
+    }
 
-            h1 {
-                font-size: 1.5em;
-            }
+    .forgery {
+      color: #dc3545;
+      font-weight: bold;
+    }
 
-            .submit-btn {
-                padding: 10px 15px;
-                font-size: 1em;
-            }
+    .distance-info {
+      color: #6c757d;
+      margin-top: 5px;
+    }
 
-            .custom-file-input {
-                height: 40px;
-            }
-        }
-    </style>
+    @media (max-width: 600px) {
+      .upload-section {
+        flex-direction: column;
+      }
+    }
+  </style>
 </head>
 <body>
-    <h1>Signature Verification</h1>
-    <form method="POST" enctype="multipart/form-data">
-        <div class="file-upload-wrapper">
-            <label class="file-upload-label" for="file1">Upload Signature 1:</label>
-            <div class="custom-file-input">
-                <span class="custom-file-text" id="file1-text">No file chosen</span>
-                <span class="upload-icon">📁</span>
-            </div>
-            <input type="file" class="file-input" name="file1" id="file1" required>
-        </div>
-        
-        <div class="file-upload-wrapper">
-            <label class="file-upload-label" for="file2">Upload Signature 2:</label>
-            <div class="custom-file-input">
-                <span class="custom-file-text" id="file2-text">No file chosen</span>
-                <span class="upload-icon">📁</span>
-            </div>
-            <input type="file" class="file-input" name="file2" id="file2" required>
-        </div>
-        
-        <input type="submit" class="submit-btn" value="Verify Signatures">
-    </form>
+  <h1>Signature Verification</h1>
 
-    {% if result %}
-        <div class="result-container">
-            <div class="result {% if 'MATCH' in result %}match{% else %}forgery{% endif %}">
-                <strong>Result:</strong> {{ result }}
-            </div>
-            <div class="distance-info">
-                <strong>Euclidean Distance:</strong> {{ distance }}
-            </div>
+  <form id="verifyForm" enctype="multipart/form-data">
+    <div class="upload-section">
+      <!-- Signature 1 -->
+      <div class="file-upload-container">
+        <label class="file-upload-label">Upload Signature 1:</label>
+        <div class="custom-file-input">
+          <span class="custom-file-text" id="file1-text">No file chosen</span>
+          <input type="file" class="file-input" name="file1" id="file1" accept="image/*" required>
         </div>
-    {% endif %}
-    
-    <script>
-        // JavaScript to update the file names
-        document.querySelectorAll('.file-input').forEach(input => {
-            input.addEventListener('change', (e) => {
-                const fileName = e.target.files[0] ? e.target.files[0].name : 'No file chosen';
-                const textElementId = e.target.id + '-text';
-                document.getElementById(textElementId).textContent = fileName;
-            });
+        <div class="preview-container">
+          <img id="preview1" src="" alt="Signature 1 Preview" style="display:none;">
+        </div>
+      </div>
+
+      <!-- Signature 2 -->
+      <div class="file-upload-container">
+        <label class="file-upload-label">Upload Signature 2:</label>
+        <div class="custom-file-input">
+          <span class="custom-file-text" id="file2-text">No file chosen</span>
+          <input type="file" class="file-input" name="file2" id="file2" accept="image/*" required>
+        </div>
+        <div class="preview-container">
+          <img id="preview2" src="" alt="Signature 2 Preview" style="display:none;">
+        </div>
+      </div>
+    </div>
+
+    <div style="text-align:center;">
+      <button type="submit" class="submit-btn">Verify Signatures</button>
+    </div>
+  </form>
+
+  <!-- Result Container -->
+  <div class="result-container" id="resultContainer">
+    <div id="resultText"></div>
+    <div class="distance-info" id="distanceText"></div>
+  </div>
+
+  <script>
+    // Clickable custom file input + preview
+    document.querySelectorAll('.file-upload-container').forEach(container => {
+      const input = container.querySelector('.file-input');
+      const customDiv = container.querySelector('.custom-file-input');
+      const textElement = container.querySelector('.custom-file-text');
+      const previewElement = container.querySelector('img');
+
+      customDiv.addEventListener('click', () => input.click());
+
+      input.addEventListener('change', () => {
+        const file = input.files[0];
+        textElement.textContent = file ? file.name : 'No file chosen';
+        if (file && file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            previewElement.src = e.target.result;
+            previewElement.style.display = 'block';
+          };
+          reader.readAsDataURL(file);
+        } else {
+          previewElement.src = '';
+          previewElement.style.display = 'none';
+        }
+      });
+    });
+
+    // AJAX form submission (expects Flask JSON response)
+    const form = document.getElementById('verifyForm');
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const resultContainer = document.getElementById('resultContainer');
+      const resultText = document.getElementById('resultText');
+      const distanceText = document.getElementById('distanceText');
+
+      resultContainer.style.display = 'none';
+      resultText.textContent = 'Processing...';
+      distanceText.textContent = '';
+      resultContainer.style.display = 'block';
+
+      try {
+        const response = await fetch('/', {
+          method: 'POST',
+          body: formData
         });
-    </script>
+        const data = await response.json();
+
+        if (data.result) {
+          resultText.textContent = 'Result: ' + data.result;
+          resultText.className = data.result.includes('MATCH') ? 'match' : 'forgery';
+          distanceText.textContent = 'Euclidean Distance: ' + data.distance.toFixed(4);
+        } else {
+          resultText.textContent = 'Error: Invalid response';
+        }
+      } catch (error) {
+        resultText.textContent = 'An error occurred while verifying signatures.';
+      }
+    });
+  </script>
 </body>
 </html>
