@@ -127,16 +127,6 @@ Sign-verify/
 
 ---
 
-## 📈 Future Roadmap
-
-- [ ] Contrastive / Triplet Loss for improved embedding quality
-- [ ] REST API with Swagger docs for third-party integrations
-- [ ] Batch verification support
-- [ ] Mobile-friendly UI overhaul
-- [ ] PostgreSQL integration for audit logging
-
----
-
 <div align="center">
   <p>Built with ❤️ for Secure Document Verification.</p>
 </div>
